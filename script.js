@@ -17,10 +17,14 @@ document.getElementById('calculate-microwave').addEventListener('click', () => {
     const seconds = parseInt(inputTime[1]);
     const totalSeconds = minutes * 60 + seconds;
 
+    const calculateTime = (targetPower, basePower, baseTime) => {
+        return Math.floor((basePower / targetPower) * baseTime);
+    };
+
     const results = {
-        500: Math.floor((totalSeconds / inputPower) * 500),
-        600: Math.floor((totalSeconds / inputPower) * 600),
-        700: Math.floor((totalSeconds / inputPower) * 700)
+        500: calculateTime(500, inputPower, totalSeconds),
+        600: calculateTime(600, inputPower, totalSeconds),
+        700: calculateTime(700, inputPower, totalSeconds)
     };
 
     const displayResults = `
@@ -31,7 +35,6 @@ document.getElementById('calculate-microwave').addEventListener('click', () => {
 
     document.getElementById('microwave-results').innerHTML = displayResults;
 });
-
 document.getElementById('calculate-project-sekai').addEventListener('click', () => {
     const currentStamina = parseInt(document.getElementById('current-stamina').value);
     const timeToNextRecovery = parseInt(document.getElementById('time-to-next-recovery').value);
@@ -39,7 +42,8 @@ document.getElementById('calculate-project-sekai').addEventListener('click', () 
     const recoveryTimes = {
         20: (20 - currentStamina) * 30,
         25: (25 - currentStamina) * 30,
-        30: (30 - currentStamina) * 30
+        30: (30 - currentStamina) * 30,
+        50: (50 - currentStamina) * 30
     };
 
     const now = new Date();
@@ -49,14 +53,20 @@ document.getElementById('calculate-project-sekai').addEventListener('click', () 
         }
         const fullRecoveryTime = new Date(now.getTime() + recoveryTimes[stamina] * 60000);
         const adjustedRecoveryTime = new Date(fullRecoveryTime.getTime() - (30 - timeToNextRecovery) * 60000);
-        return `ライボ${stamina}:${adjustedRecoveryTime.getHours()}時${adjustedRecoveryTime.getMinutes()}分`;
 
+        let dayText = "";
+        if (adjustedRecoveryTime.getDate() > now.getDate()) {
+            dayText = "翌日";
+        }
+
+        return `ライボ${stamina}:${dayText}${adjustedRecoveryTime.getHours()}時${adjustedRecoveryTime.getMinutes()}分`;
     };
 
     const results = [
         calculateRecoveryTime(20, currentStamina, timeToNextRecovery),
         calculateRecoveryTime(25, currentStamina, timeToNextRecovery),
-        calculateRecoveryTime(30, currentStamina, timeToNextRecovery)
+        calculateRecoveryTime(30, currentStamina, timeToNextRecovery),
+        calculateRecoveryTime(50, currentStamina, timeToNextRecovery)
     ].join('<br>');
 
     document.getElementById('project-sekai-results').innerHTML = results;
